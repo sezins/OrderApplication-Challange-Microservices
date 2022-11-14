@@ -1,0 +1,41 @@
+version: '3.4'
+
+services:
+  customerdb:
+    image: mongo
+
+  orderdb:
+    image: mongo
+
+  customerapi:
+    image: ${DOCKER_REGISTRY-}customerapi
+    build:
+      context: .
+      dockerfile: CustomerAPI/Dockerfile
+
+  orderapi:
+    image: ${DOCKER_REGISTRY-}orderapi
+    build:
+      context: .
+      dockerfile: OrderAPI/Dockerfile
+
+  ocelot_apigw:
+    image: ${DOCKER_REGISTRY-}ocelotapigw
+    build:
+      context: .
+      dockerfile: Ocelot_apigw/Dockerfile
+
+  aggregation_api:
+    image: ${DOCKER_REGISTRY-}aggregationapi
+    build:
+      context: .
+      dockerfile: Aggregation_Api/Dockerfile
+
+volumes:
+  mongo_data:
+  
+
+
+
+
+

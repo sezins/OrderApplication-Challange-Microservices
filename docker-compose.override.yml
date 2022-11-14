@@ -1,0 +1,60 @@
+version: '3.4'
+
+services:
+  customerdb:
+    container_name: customerdb
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+
+  orderdb:
+    container_name: orderdb
+    restart: always
+    ports:
+      - 27018:27017
+    volumes:
+      - mongo_data:/data/db 
+
+  customerapi:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "CustomerDatabaseSettings:ConnectionString:mongodb://customerdb:27017"
+    depends_on:
+      - customerdb
+    ports:
+      - "8000:80"
+
+  orderapi:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "OrderDatabaseSettings:ConnectionString:mongodb://orderdb:27017"
+    depends_on:
+      - orderdb
+    ports:
+      - "8001:80"
+
+  ocelot_apigw:
+    container_name: ocelot_apigw
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - customerapi
+      - orderapi
+    ports:
+      - "8010:80"
+
+
+  aggregation_api:
+    container_name: aggregation_api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "ApiSettings": "CustomerUrl": "http://customerapi",
+      - "ApiSettings": "OrderUrl": "http://orderapi"
+    depends_on:
+      - customerapi
+      - orderapi
+    ports:
+      - "8005:80"
+
